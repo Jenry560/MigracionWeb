@@ -1,0 +1,146 @@
+@page "/mantenimiento"
+@using Microsoft.EntityFrameworkCore
+@using MigracionWeb.Data
+@using MigracionWeb.Models
+@rendermode InteractiveServer
+@inject AppDbContext context
+
+<ModalComponent @ref="Modal" titulo="Nuevo Detencion">
+    <EditForm Model="detencion" class="col">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label class="col-form-label">Fecha Detencion</label>
+            <InputDate @bind-Value="detencion.FechaDetencion" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="col-form-label">Nombre Completo</label>
+            <InputText @bind-Value="detencion.NombreCompleto" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="col-form-label">Numero Pasaporte</label>
+            <InputText @bind-Value="detencion.NumeroPasaporte" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="col-form-label">Fecha Nacimiento</label>
+            <InputDate @bind-Value="detencion.FechaNacimiento" class="form-control" />
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <label class="col-form-label">Latitud</label>
+                <InputNumber @bind-Value="detencion.Latitud" class="form-control" />
+            </div>
+            <div class="col-6">
+                <label class="col-form-label">Logitud</label>
+                <InputNumber @bind-Value="detencion.Longitud" class="form-control" />
+            </div>
+        </div>
+        <button class="btn btn-primary mt-2" @onclick="Save">
+            Guardar
+        </button>
+    </EditForm>
+</ModalComponent>
+
+<div class="card">
+    <div class="card-header">
+        Mantenimiento
+    </div>
+
+    <div class="card-body">
+        <button class="btn btn-primary" @onclick="Nuevo">
+            Agregar Nuevo
+        </button>
+        <table class="table mt-2">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Fecha</th>
+                    <th>Nombre Completo</th>
+                    <th>Numero Pasaporte</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Cordenadas</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detencion in detenciones)
+                {
+                    <tr>
+                        <td>@detencion.Id</td>
+                        <td>@detencion.FechaDetencion</td>
+                        <td>@detencion.NombreCompleto</td>
+                        <td>@detencion.NumeroPasaporte</td>
+                        <td>@detencion.FechaNacimiento</td>
+                        <td>@detencion.Latitud, @detencion.Longitud</td>
+                        <td>
+                            <button class="btn btn-warning" @onclick="() => editar(detencion)">
+                                Editar
+                            </button>
+
+                            <button class="btn btn-danger" @onclick="() => Eliminar(detencion)">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+@code {
+    ModalComponent? Modal;
+    Detencion detencion = new Detencion();
+    List<Detencion> detenciones = new List<Detencion>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await GetAllData();
+    }
+
+    private async Task GetAllData()
+    {
+
+        detenciones = await context.Detenciones.ToListAsync();
+    }
+
+
+    private async Task Save()
+    {
+
+        if (detencion.Id == 0)
+        {
+            context.Detenciones.Add(detencion);
+        }
+        else
+        {
+            context.Detenciones.Update(detencion);
+        }
+        await context.SaveChangesAsync();
+        await GetAllData();
+        Modal?.CloseModal();
+
+    }
+
+    private void Nuevo()
+    {
+        detencion = new Detencion();
+
+        Modal?.ShowModal();
+    }
+
+    private void editar(Detencion detencionEditar)
+    {
+        detencion = detencionEditar;
+        Modal?.ShowModal();
+    }
+    private async Task Eliminar(Detencion detencionEditar)
+    {
+        context.Detenciones.Remove(detencionEditar);
+        await context.SaveChangesAsync();
+        await GetAllData();
+    }
+}

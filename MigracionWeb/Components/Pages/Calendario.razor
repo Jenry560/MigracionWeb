@@ -1,0 +1,72 @@
+
+@page "/calendario"
+
+<PageTitle>Calendario</PageTitle>
+
+@using Microsoft.EntityFrameworkCore
+@using MigracionWeb.Data
+@using MigracionWeb.Models
+@rendermode InteractiveServer
+@inject AppDbContext context
+
+<ModalComponent @ref="Modal" titulo="Detenciones" >
+      <table class="table mt-2">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Fecha</th>
+                    <th>Nombre Completo</th>
+                    <th>Numero Pasaporte</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Cordenadas</th>
+                   
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detencion in detencionesModal)
+                {
+                    <tr>
+                        <td>@detencion.Id</td>
+                        <td>@detencion.FechaDetencion</td>
+                        <td>@detencion.NombreCompleto</td>
+                        <td>@detencion.NumeroPasaporte</td>
+                        <td>@detencion.FechaNacimiento</td>
+                        <td>@detencion.Latitud, @detencion.Longitud</td>
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+</ModalComponent>
+
+<div class="card">
+    <div class="card-header">
+        Calendario Detenciones
+    </div>
+    <div class="card-body">
+        <CalendarComponent EventDates="EventDates" OnDateSelected="OnDateSelected"  />
+    </div>
+</div>
+
+
+@code {
+
+    Dictionary<DateTime, string> EventDates = new Dictionary<DateTime, string>();
+    ModalComponent? Modal;
+    List<Detencion> detenciones = new List<Detencion>();
+    List<Detencion> detencionesModal = new List<Detencion>();
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        detenciones = await context.Detenciones.ToListAsync();
+        EventDates = detenciones.GroupBy(x => x.FechaDetencion.Date).ToDictionary(x => x.Key, x => $"Numero de Detenciones: {x.Count()}");
+    }
+
+    private void OnDateSelected(DateTime date)
+    {
+        detencionesModal = detenciones.Where(d => d.FechaDetencion.Date == date.Date).ToList();
+        Modal?.ShowModal();
+    }
+
+}

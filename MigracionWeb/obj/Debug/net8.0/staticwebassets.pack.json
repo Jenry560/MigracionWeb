@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\Deskop\\Itla\\MigracionWeb\\migracionWeb\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\MigracionWeb.bundle.scp.css",
+      "PackagePath": "staticwebassets\\MigracionWeb.bundle.scp.css"
+    },
+    {
+      "Id": "D:\\Deskop\\Itla\\MigracionWeb\\migracionWeb\\wwwroot\\app.css",
+      "PackagePath": "staticwebassets\\app.css"
+    },
+    {
+      "Id": "D:\\Deskop\\Itla\\MigracionWeb\\migracionWeb\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css"
+    },
+    {
+      "Id": "D:\\Deskop\\Itla\\MigracionWeb\\migracionWeb\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
+    },
+    {
+      "Id": "D:\\Deskop\\Itla\\MigracionWeb\\migracionWeb\\wwwroot\\favicon.png",
+      "PackagePath": "staticwebassets\\favicon.png"
+    },
+    {
+      "Id": "D:\\Deskop\\Itla\\MigracionWeb\\migracionWeb\\wwwroot\\image.png",
+      "PackagePath": "staticwebassets\\image.png"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.MigracionWeb.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.MigracionWeb.props",
+      "PackagePath": "build\\MigracionWeb.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.MigracionWeb.props",
+      "PackagePath": "buildMultiTargeting\\MigracionWeb.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.MigracionWeb.props",
+      "PackagePath": "buildTransitive\\MigracionWeb.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

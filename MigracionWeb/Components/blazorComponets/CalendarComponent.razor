@@ -1,0 +1,161 @@
+@using System.Globalization
+
+<div class="calendar-container">
+    <h3 class="text-center">
+        Calendario de @CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(Month) @Year
+    </h3>
+
+    <div class="d-flex justify-content-between my-3">
+        <button class="btn btn-outline-primary" @onclick="ShowPreviousMonth">Anterior</button>
+        <button class="btn btn-outline-primary" @onclick="ShowNextMonth">Siguiente</button>
+    </div>
+
+    <table class="table table-bordered text-center">
+        <thead>
+            <tr>
+                <!-- Encabezado con los días de la semana -->
+                @foreach (var day in DaysOfWeek)
+                {
+                    <th class="bg-light">@day</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var week in CalendarWeeks)
+            {
+                <tr>
+                    @foreach (var day in week)
+                    {
+                        <td @onclick="() => OnDaySelected(day)"
+                            class="@(day.HasValue && EventDates.ContainsKey(new DateTime(Year, Month, day.Value)) ? "bg-primary text-white " : "")"
+                            style="cursor: pointer;">
+                            @if (day.HasValue)
+                            {
+                                <div>
+                                    <span>@day.Value</span>
+                                    @if (EventDates.ContainsKey(new DateTime(Year, Month, day.Value)))
+                                    {
+                                        <!-- Muestra los eventos asociados al día -->
+                                        <div class="event-text mt-2">@EventDates[new DateTime(Year, Month, day.Value)]</div>
+                                    }
+                                </div>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    // Propiedades para el año y el mes actuales
+    public int Year { get; set; } = DateTime.Now.Year;
+    public int Month { get; set; } = DateTime.Now.Month;
+
+    // Parámetros para los eventos y la acción cuando se selecciona una fecha
+    [Parameter] public Dictionary<DateTime, string> EventDates { get; set; } = new Dictionary<DateTime, string>();
+    [Parameter] public EventCallback<DateTime> OnDateSelected { get; set; }
+
+    // Listas para almacenar los días de la semana y las semanas del calendario
+    private List<string> DaysOfWeek { get; set; } = new List<string>();
+    private List<List<int?>> CalendarWeeks { get; set; } = new List<List<int?>>();
+
+    // Inicializa los días de la semana y genera el calendario
+    protected override void OnInitialized()
+    {
+        DaysOfWeek = CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames.ToList();
+        GenerateCalendar();
+    }
+
+    // Se llama cada vez que se establecen parámetros, útil para regenerar el calendario si cambian los parámetros
+    protected override void OnParametersSet()
+    {
+        GenerateCalendar();
+    }
+
+    // Genera las semanas del calendario para el mes actual
+    private void GenerateCalendar()
+    {
+        // Limpia las semanas del calendario existente
+        CalendarWeeks.Clear();
+
+        // Obtiene el primer día del mes y el número de días en el mes
+        DateTime firstDayOfMonth = new DateTime(Year, Month, 1);
+        int daysInMonth = DateTime.DaysInMonth(Year, Month);
+        int startDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+
+        // Crea una lista para la semana actual
+        List<int?> week = new List<int?>();
+
+        // Agrega espacios vacíos para los días que no pertenecen al mes
+        for (int i = 0; i < startDayOfWeek; i++)
+        {
+            week.Add(null);
+        }
+
+        // Agrega los días del mes a la semana
+        for (int day = 1; day <= daysInMonth; day++)
+        {
+            if (week.Count == 7)
+            {
+                // Al llegar a 7 días, agrega la semana a la lista de semanas y comienza una nueva
+                CalendarWeeks.Add(week);
+                week = new List<int?>();
+            }
+            week.Add(day);
+        }
+
+        // Completa la última semana si no tiene 7 días
+        if (week.Count > 0)
+        {
+            while (week.Count < 7)
+            {
+                week.Add(null); // Agrega espacios vacíos para completar la semana
+            }
+            CalendarWeeks.Add(week);
+        }
+    }
+
+    // Maneja la selección de un día
+    private async Task OnDaySelected(int? day)
+    {
+        if (day.HasValue)
+        {
+            // Crea una nueva fecha con el año, mes y día seleccionados
+            var selectedDate = new DateTime(Year, Month, day.Value);
+            // Invoca el callback para la fecha seleccionada
+            await OnDateSelected.InvokeAsync(selectedDate);
+        }
+    }
+
+    // Cambia a el mes anterior
+    private void ShowPreviousMonth()
+    {
+        if (Month == 1) // Si es enero, cambia a diciembre del año anterior
+        {
+            Month = 12;
+            Year--;
+        }
+        else
+        {
+            Month--; // Decrementa el mes
+        }
+        GenerateCalendar(); // Regenera el calendario
+    }
+
+    // Cambia al siguiente mes
+    private void ShowNextMonth()
+    {
+        if (Month == 12) // Si es diciembre, cambia a enero del año siguiente
+        {
+            Month = 1;
+            Year++;
+        }
+        else
+        {
+            Month++; // Incrementa el mes
+        }
+        GenerateCalendar(); // Regenera el calendario
+    }
+}

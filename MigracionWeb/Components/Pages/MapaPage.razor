@@ -1,0 +1,34 @@
+@page "/mapa"
+
+<PageTitle>Mapa</PageTitle>
+
+@using Microsoft.EntityFrameworkCore
+@using MigracionWeb.Data
+@using MigracionWeb.Models
+@rendermode InteractiveServer
+@inject AppDbContext context
+
+<div class="card">
+    <div class="card-header">
+        Mapa de las detenciones capturadas
+    </div>
+    <div class="card-body">
+        <Mapa detenciones="detenciones" />
+    </div>
+</div>
+
+
+@code {
+
+    List<Detencion> detenciones = new List<Detencion>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        detenciones = await context.Detenciones.ToListAsync();
+
+    }
+
+
+
+}

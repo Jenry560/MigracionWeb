@@ -1,0 +1,53 @@
+@using Microsoft.JSInterop
+@using MigracionWeb.Models
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
+
+<h3>Mapa</h3>
+
+<div id="map" style="height: 500px;"></div>
+
+@code {
+    [Parameter] public List<Detencion> detenciones { get; set; } = new List<Detencion>();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await MostrarMapa();
+        }
+    }
+
+    private async Task MostrarMapa()
+    {
+        var script = @"
+var map = L.map('map').setView([18.4861, -69.9312], 8); // Centra el mapa en Santo Domingo
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+maxZoom: 19,
+attribution: '&copy; <a href=""https://www.openstreetmap.org/copyright"">OpenStreetMap</a> contributors'
+}).addTo(map);";
+
+        foreach (var detencion in detenciones)
+        {
+            script += $@"
+var marker = L.marker([{detencion.Latitud}, {detencion.Longitud}]).addTo(map)
+.bindPopup('<div>' +
+'<h4>Datos de la Detención</h4>' +
+'<p><strong>Número de Pasaporte:</strong> {detencion.NumeroPasaporte}</p>' +
+'<p><strong>Nombre Completo:</strong> {detencion.NombreCompleto}</p>' +
+'<p><strong>Fecha de Detención:</strong> {detencion.FechaDetencion}</p>' +
+'<p><strong>Fecha de Nacimiento:</strong> {detencion.FechaNacimiento}</p>' +
+'</div>');";
+
+        }
+
+
+        // Ejecuta el script en el navegador
+        await JSRuntime.InvokeVoidAsync("eval", script);
+    }
+
+
+
+}

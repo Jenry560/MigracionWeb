@@ -1,0 +1,6 @@
+{
+    "dotnet.defaultSolution": "MigracionWeb.sln",
+    "cSpell.enableFiletypes": [
+        "!csharp"
+    ]
+}
